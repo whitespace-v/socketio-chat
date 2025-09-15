@@ -1,22 +1,38 @@
+# Событие login После того как пользователь ввёл имя и присоединился к чату
+Устанавливает флаг соединения (connected = true)
+Отображает сообщение
+Показывает количество участников в чате
 
-# Socket.IO Chat
+# Событие new message срабатывает при отправке пользователем сообщения
+Обновляет username пользователя к отправленному сообщению
+Сохраняет message и username пользователя
 
-A simple chat demo for Socket.IO
+## Событие typing когда клиент начинает печатать
+Отображает сообщение вида username is typing
+Содержит username пользователя, который печатает
 
-## How to use
+## Событие stop typing когда клиент перестает печатать
+Удаляет сообщение username is typing
+Содержит username пользователя, который перестал печатать
 
-```
-$ npm i
-$ npm start
-```
+## Событие user left срабатывает когда пользователь отключается от чата
+Показывает сообщение username left
+Обновляет количество участников
+Удаляет индикатор "печатает" у этого пользователя
 
-And point your browser to `http://localhost:3000`. Optionally, specify
-a port by supplying the `PORT` env variable.
+## Событие user reconnect Когда соединение с сервером восстановлено
+Отправляет сообщение о переподключении
 
-## Features
+## Событие reconnect error при ошибке переподключения пользователя
+Отправляет сообщение об ошибке 
 
-- Multiple users can join a chat room by each entering a unique username
-on website load.
-- Users can type chat messages to the chat room.
-- A notification is sent to all users when a user joins or leaves
-the chatroom.
+## Событие new message при отправке пользователем сообщения
+Отображает полученное сообщение в списке чата, добавляет username пользователя к отправленному сообщению
+
+## Событие disconnect срабатывает при разрыве соединения
+Проверяет, был ли пользователь авторизован в системе
+Удаляет пользователя из numUsers
+
+## Событие reconnect срабатывает при переподключении пользователя к сайту
+Отправляет сообщение о переподключении
+Повторно отправляет имя пользователя на сервер
