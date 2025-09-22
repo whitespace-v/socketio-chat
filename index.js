@@ -1,16 +1,25 @@
 // Setup basic express server
-const express = require('express');
-const app = express();
-const path = require('path');
-const server = require('http').createServer(app);
-const io = require('socket.io')(server);
-const port = process.env.PORT || 3000;
 
-server.listen(port, () => {
+import { PrismaClient } from '@prisma/client';
+import express from 'express';
+import path from 'path';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import { fileURLToPath } from 'url';
+
+const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer);
+
+const port = process.env.PORT || 3000
+
+httpServer.listen(port, () => {
   console.log('Server listening at port %d', port);
 });
-
+const client = new PrismaClient()
 // Routing
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Chatroom
@@ -22,17 +31,23 @@ io.on('connection', (socket) => {
 
   // when the client emits 'new message', this listens and executes
   socket.on('new message', (data) => {
-    // we tell the client to execute 'new message'
+    // Добавляем Сообщение в БД
     socket.broadcast.emit('new message', {
       username: socket.username,
       message: data
     });
   });
-
-  // when the client emits 'add user', this listens and executes
-  socket.on('add user', (username) => {
+  socket.on('add user', async (username) => {
     if (addedUser) return;
 
+    const user = await client.user.create({
+      data: {username, password: ""}
+    })
+
+    console.log() // получаем сообщения
+    console.log(user);
+    
+    //* *//
     // we store the username in the socket session for this client
     socket.username = username;
     ++numUsers;
@@ -40,6 +55,8 @@ io.on('connection', (socket) => {
     socket.emit('login', {
       numUsers: numUsers
     });
+
+
     // echo globally (all clients) that a person has connected
     socket.broadcast.emit('user joined', {
       username: socket.username,
